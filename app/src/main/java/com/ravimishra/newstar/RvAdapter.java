@@ -59,7 +59,7 @@ public class RvAdapter extends RecyclerView.Adapter<RvAdapter.MyViewHolder> {
         requestOptions.placeholder(Utils.getRandomDrawbleColor());
         requestOptions.error(Utils.getRandomDrawbleColor());
         requestOptions.diskCacheStrategy(DiskCacheStrategy.ALL);
-        requestOptions.centerCrop();
+      //  requestOptions.override(100, 80);
         final Articles model = articles.get(i);
         final String url=model.getUrl();
         String datee = Utils.DateFormat(model.getDate());

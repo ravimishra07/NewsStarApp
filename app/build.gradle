@@ -40,4 +40,7 @@ dependencies {
     implementation 'org.ocpsoft.prettytime:prettytime:4.0.1.Final'
     implementation 'com.facebook.shimmer:shimmer:0.1.0@aar'
 
+    //paging lib
+    implementation "android.arch.paging:runtime:1.0.1"
+
 }
