@@ -10,13 +10,15 @@ public interface ApiInterface {
     @GET("top-headlines")
     Call<News> getTopNews(
             @Query("country") String country,
-            @Query("apiKey") String apiKey
+            @Query("apiKey") String apiKey,
+            @Query("pageSize") int pageCount
     );
 
     @GET("everything")
     Call<News> getNews(
             @Query("q") String q,
-
-            @Query("apiKey") String apiKey
+            @Query("apiKey") String apiKey,
+            @Query("pageSize") int pageCount
     );
+
 }

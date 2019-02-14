@@ -30,7 +30,6 @@
             app:tabIndicatorColor="@android:color/white"
             app:tabIndicatorHeight="2dp"
 
-            app:layout_scrollFlags="scroll|enterAlways|snap"
             />
 
     </android.support.design.widget.AppBarLayout>

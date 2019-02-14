@@ -47,9 +47,11 @@
 
                 <android.support.v7.widget.RecyclerView
                     android:id="@+id/recylerviewTopNews"
-
+                    android:nestedScrollingEnabled="false"
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent" />
+                   
+                    android:layout_height="match_parent"
+                    android:focusableInTouchMode="true"/>
             </LinearLayout>
         </android.support.v4.widget.NestedScrollView>
     </android.support.v4.widget.SwipeRefreshLayout>

@@ -42,7 +42,8 @@ public class MainActivity extends AppCompatActivity
         FragmentSportsNews.OnFragmentInteractionListener,
         FragmentHeathcareNews.OnFragmentInteractionListener,
         FramentTopNews.OnFragmentInteractionListener, View.OnClickListener,
-        FragmentSearchNews.OnFragmentInteractionListener
+        FragmentSearchNews.OnFragmentInteractionListener,
+        FragmentEntertainmentNews.OnFragmentInteractionListener
 
 {
 
@@ -62,7 +63,7 @@ public class MainActivity extends AppCompatActivity
         tabs= (TabLayout) findViewById(R.id.tabs);
         // btnRetry = findViewById(R.id.btnRetry);
         errorLayout = findViewById(R.id.error_layout);
-    viewPager = (ViewPager) findViewById(R.id.viewpager);
+        viewPager = (ViewPager) findViewById(R.id.viewpager);
         setupViewPager(viewPager);
         tabs.setupWithViewPager(viewPager);
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -111,10 +112,12 @@ public class MainActivity extends AppCompatActivity
     private void setupViewPager(ViewPager viewPager) {
         TabAdapter adapter = new TabAdapter(getSupportFragmentManager());
         adapter.addFragment(new FramentTopNews(), "Top");
-//        adapter.addFragment(new FragmentTechNews(), "Technology");
-//        adapter.addFragment(new FragmentHeathcareNews(), "Healthcare");
-//        adapter.addFragment(new FragmentScienceNews(), "Science");
-//        adapter.addFragment(new FragmentSportsNews(), "Sports");
+
+        adapter.addFragment(new FragmentSportsNews(), "Sports");
+        adapter.addFragment(new FragmentTechNews(), "Technology");
+        adapter.addFragment(new FragmentHeathcareNews(), "Healthcare");
+        adapter.addFragment(new FragmentEntertainmentNews(), "Entertainment");
+        adapter.addFragment(new FragmentScienceNews(), "Science");
         viewPager.setAdapter(adapter);
     }
 

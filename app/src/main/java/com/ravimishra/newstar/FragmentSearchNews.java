@@ -99,7 +99,7 @@ public class FragmentSearchNews extends Fragment {
         //String q = "india";
         Call<News> call;
         String strtext = getArguments().getString("query");
-        call = apiInterface.getNews(strtext,Constants.API_KEY);
+        call = apiInterface.getNews(strtext,Constants.API_KEY,50);
         call.enqueue(new Callback<News>() {
             @Override
             public void onResponse(Call<News> call, Response<News> response) {

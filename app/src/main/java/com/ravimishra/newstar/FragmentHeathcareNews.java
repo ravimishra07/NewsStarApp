@@ -1,89 +1,172 @@
 package com.ravimishra.newstar;
 
 import android.content.Context;
+import android.net.ConnectivityManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.widget.SwipeRefreshLayout;
+import android.support.v7.widget.DefaultItemAnimator;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.FrameLayout;
+import android.widget.ImageView;
+import android.widget.RelativeLayout;
+import android.widget.TextView;
+import android.widget.Toast;
+
+import com.facebook.shimmer.ShimmerFrameLayout;
+import com.ravimishra.newstar.Model.Articles;
+import com.ravimishra.newstar.Model.News;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 
-/**
- * A simple {@link Fragment} subclass.
- * Activities that contain this fragment must implement the
- * {@link FragmentHeathcareNews.OnFragmentInteractionListener} interface
- * to handle interaction events.
- * Use the {@link FragmentHeathcareNews#newInstance} factory method to
- * create an instance of this fragment.
- */
-public class FragmentHeathcareNews extends Fragment {
-    // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-    private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
+public class FragmentHeathcareNews  extends Fragment {
+    Context context;
+    TextView ty_error;
+    ImageView iv_error;
+    RecyclerView recyclerViewTopNews;
+    FrameLayout frameLayoutHealthNews;
+    FragmentHeathcareNews.OnFragmentInteractionListener mListener;
+    RecyclerView recyclerView;
+    RvAdapter rvAdapter;
+    SwipeRefreshLayout swipeRefreshLayout;
+    RecyclerView.LayoutManager layoutManager;
+    RelativeLayout errorLayout;
+    Button btnRetry;
+    private ShimmerFrameLayout mShimmerViewContainer;
+    private List<Articles> articles = new ArrayList<>();
 
-    // TODO: Rename and change types of parameters
-    private String mParam1;
-    private String mParam2;
-
-    private OnFragmentInteractionListener mListener;
-
-    public FragmentHeathcareNews() {
-        // Required empty public constructor
-    }
-
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     * @param param1 Parameter 1.
-     * @param param2 Parameter 2.
-     * @return A new instance of fragment FragmentHeathcareNews.
-     */
-    // TODO: Rename and change types and number of parameters
-    public static FragmentHeathcareNews newInstance(String param1, String param2) {
-        FragmentHeathcareNews fragment = new FragmentHeathcareNews();
-        Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
-        fragment.setArguments(args);
-        return fragment;
-    }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
-        }
+
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_fragment_heathcare_news, container, false);
+        // Inflate the layout for this
+        View view = inflater.inflate(R.layout.fragment_fragment_heathcare_news, container, false);
+
+        frameLayoutHealthNews = view.findViewById(R.id.topNewsLayout);
+        iv_error = view.findViewById(R.id.iv_error);
+        ty_error = view.findViewById(R.id.tv_error);
+        swipeRefreshLayout = view.findViewById(R.id.swipeRefresh);
+        mShimmerViewContainer = view.findViewById(R.id.shimmer_view_container);
+        //  btnRetry=view.findViewById(R.id.btnRetry);
+        errorLayout = view.findViewById(R.id.error_layout);
+        recyclerView = view.findViewById(R.id.recylerviewTopNews);
+        layoutManager = new LinearLayoutManager(getActivity());
+        recyclerView.setLayoutManager(layoutManager);
+        recyclerView.setItemAnimator(new DefaultItemAnimator());
+        // recyclerView.setAdapter(rvAdapter);
+        recyclerView.setNestedScrollingEnabled(false);
+        recyclerView.setItemAnimator(new DefaultItemAnimator());
+        mShimmerViewContainer.startShimmerAnimation();
+        //  recyclerView.addItemDecoration(new MyDividerItemDecoration(this, LinearLayoutManager.VERTICAL, 16));
+        //recyclerView);
+        checkNetwork();
+
+        swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                checkNetwork();
+                loadJSON();
+                swipeRefreshLayout.setRefreshing(false);
+            }
+        });
+        loadJSON();
+        return view;
     }
 
-    // TODO: Rename method, update argument and hook method into UI event
-    public void onButtonPressed(Uri uri) {
-        if (mListener != null) {
-            mListener.onFragmentInteraction(uri);
+
+    public void loadJSON() {
+        ApiInterface apiInterface = ApiClient.getApiClient().create(ApiInterface.class);
+        String country = Utils.getCountry();
+        //String q = "india";
+
+        Call<News> call;
+        int page=50;
+        call = apiInterface.getNews("Health",Constants.API_KEY,page);
+        call.enqueue(new Callback<News>() {
+            @Override
+            public void onResponse(Call<News> call, Response<News> response) {
+                if (response.isSuccessful() && response.body().getArticles() != null) {
+
+                    articles = response.body().getArticles();
+                    rvAdapter = new RvAdapter(articles, getActivity());
+                    recyclerView.setAdapter(rvAdapter);
+                    rvAdapter.notifyDataSetChanged();
+                    mShimmerViewContainer.stopShimmerAnimation();
+                    mShimmerViewContainer.setVisibility(View.GONE);
+                } else {
+                    Toast.makeText(getActivity(), "No result", Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<News> call, Throwable t) {
+
+            }
+        });
+    }
+
+
+    public interface OnFragmentInteractionListener {
+        // TODO: Update argument type and name
+        void onFragmentInteraction(Uri uri);
+    }
+
+    public void checkNetwork() {
+        if (isNetworkAvailable()) {
+            ty_error.setVisibility(View.GONE);
+            iv_error.setVisibility(View.GONE);
+            errorLayout.setVisibility(View.GONE);
+            mShimmerViewContainer.setVisibility(View.VISIBLE);
+            recyclerView.setVisibility(View.VISIBLE);
+            // loadJSON();
+            //      Toast.makeText(this, "connecte4d", Toast.LENGTH_SHORT).show();
+        } else {
+            Toast.makeText(getActivity(), "no conn", Toast.LENGTH_SHORT).show();
+            recyclerView.setVisibility(View.GONE);
+            ty_error.setVisibility(View.VISIBLE);
+            iv_error.setVisibility(View.VISIBLE);
+            mShimmerViewContainer.setVisibility(View.GONE);
+            errorLayout.setVisibility(View.VISIBLE);
         }
     }
 
+    public boolean isNetworkAvailable() {
+        final ConnectivityManager connectivityManager = ((ConnectivityManager) getActivity().getSystemService(Context.CONNECTIVITY_SERVICE));
+        return connectivityManager.getActiveNetworkInfo() != null && connectivityManager.getActiveNetworkInfo().isConnected();
+    }
+
+    public FragmentHeathcareNews() {
+        // Required empty public constructor
+    }
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
-        if (context instanceof OnFragmentInteractionListener) {
-            mListener = (OnFragmentInteractionListener) context;
+        if (context instanceof FragmentHeathcareNews.OnFragmentInteractionListener) {
+            mListener = (FragmentHeathcareNews.OnFragmentInteractionListener) context;
         } else {
             throw new RuntimeException(context.toString()
                     + " must implement OnFragmentInteractionListener");
         }
     }
+
 
     @Override
     public void onDetach() {
@@ -91,18 +174,4 @@ public class FragmentHeathcareNews extends Fragment {
         mListener = null;
     }
 
-    /**
-     * This interface must be implemented by activities that contain this
-     * fragment to allow an interaction in this fragment to be communicated
-     * to the activity and potentially other fragments contained in that
-     * activity.
-     * <p>
-     * See the Android Training lesson <a href=
-     * "http://developer.android.com/training/basics/fragments/communicating.html"
-     * >Communicating with Other Fragments</a> for more information.
-     */
-    public interface OnFragmentInteractionListener {
-        // TODO: Update argument type and name
-        void onFragmentInteraction(Uri uri);
-    }
 }

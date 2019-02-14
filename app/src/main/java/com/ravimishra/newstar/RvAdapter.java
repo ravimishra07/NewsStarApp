@@ -8,7 +8,9 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.FrameLayout;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -83,7 +85,17 @@ public class RvAdapter extends RecyclerView.Adapter<RvAdapter.MyViewHolder> {
                 .transition(DrawableTransitionOptions.withCrossFade())
                 .into(myViewHolder.imageView);
 
+    myViewHolder.share.setOnClickListener(new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            Intent shareIntent = new Intent(Intent.ACTION_SEND);
+            shareIntent.setType("text/plain");
+            shareIntent.putExtra(Intent.EXTRA_SUBJECT, "My application name");
 
+            shareIntent.putExtra(Intent.EXTRA_TEXT, url);
+            context.startActivity(Intent.createChooser(shareIntent, "choose one"));
+        }
+    });
     }
 
 
@@ -97,6 +109,7 @@ public class RvAdapter extends RecyclerView.Adapter<RvAdapter.MyViewHolder> {
         ImageView imageView;
         ProgressBar progressBar;
         FrameLayout frame;
+        ImageButton share;
         OnItemClickListener onItemClickListener;
         //Context c;
 
@@ -108,6 +121,7 @@ public class RvAdapter extends RecyclerView.Adapter<RvAdapter.MyViewHolder> {
             desc = itemView.findViewById(R.id.descr);
             source = itemView.findViewById(R.id.tvSource);
             imageView = itemView.findViewById(R.id.iv);
+            share = itemView.findViewById(R.id.btnShare);
             frame = itemView.findViewById(R.id.framee);
 
             this.onItemClickListener = onItemClickListener;

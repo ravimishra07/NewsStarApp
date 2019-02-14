@@ -6,6 +6,7 @@ import android.net.ConnectivityManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.view.ViewCompat;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
@@ -76,6 +77,8 @@ public class FramentTopNews extends Fragment {
         recyclerView.setItemAnimator(new DefaultItemAnimator());
         // recyclerView.setAdapter(rvAdapter);
         recyclerView.setNestedScrollingEnabled(false);
+
+        ViewCompat.setNestedScrollingEnabled(recyclerView, false);
         recyclerView.setItemAnimator(new DefaultItemAnimator());
         mShimmerViewContainer.startShimmerAnimation();
         //  recyclerView.addItemDecoration(new MyDividerItemDecoration(this, LinearLayoutManager.VERTICAL, 16));
@@ -98,9 +101,9 @@ public class FramentTopNews extends Fragment {
     public void loadJSON() {
         ApiInterface apiInterface = ApiClient.getApiClient().create(ApiInterface.class);
         String country = Utils.getCountry();
-        //String q = "india";
+        int page=99;
         Call<News> call;
-        call = apiInterface.getTopNews("in",Constants.API_KEY);
+        call = apiInterface.getTopNews("in",Constants.API_KEY,page);
         call.enqueue(new Callback<News>() {
             @Override
             public void onResponse(Call<News> call, Response<News> response) {
