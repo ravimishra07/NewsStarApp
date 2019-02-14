@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="colorPrimary">#ef473a</color>
+    <color name="colorPrimaryDark">#cb2d3e</color>
+    <color name="colorAccent">#cb2027</color>
+
+
+    <color name="colorAccent2">#64b5f6</color>
+    <color name="placeholder_bg">#dddddd</color>
+    <color name="item_name">#0c0c0c</color>
+    <color name="description">#1a1a1a</color>
+    <color name="chef">#777</color>
+    <color name="timestamp">#777</color>
+</resources>
