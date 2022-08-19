@@ -7,7 +7,7 @@
         android:title="@string/action_search"
         app:showAsAction="always"
         android:icon="@drawable/ic_search_black_24dp"
-        app:actionViewClass="android.support.v7.widget.SearchView" />
+        app:actionViewClass="androidx.appcompat.widget.SearchView" />
     <item
         android:id="@+id/action_settings"
         android:orderInCategory="101"

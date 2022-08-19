@@ -1,38 +1,28 @@
-package com.ravimishra.newstar;
+package com.ravimishra.newstar
 
-import android.support.annotation.Nullable;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentPagerAdapter;
+import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentManager
+import androidx.fragment.app.FragmentPagerAdapter
 
-import java.util.ArrayList;
-import java.util.List;
-
-public class TabAdapter extends FragmentPagerAdapter {
-    private final List<Fragment> mFragment=new ArrayList<>();
-    private final List<String> TitleList=new ArrayList<>();
-    public TabAdapter(FragmentManager fm) {
-        super(fm);
+class TabAdapter(fm: FragmentManager?) : FragmentPagerAdapter(
+    fm!!
+) {
+    private val mFragment: MutableList<Fragment> = ArrayList()
+    private val TitleList: MutableList<String> = ArrayList()
+    override fun getItem(i: Int): Fragment {
+        return mFragment[i]
     }
 
-    @Override
-    public Fragment getItem(int i) {
-        return mFragment.get(i);
+    override fun getCount(): Int {
+        return mFragment.size
     }
 
-    @Override
-    public int getCount() {
-        return mFragment.size();
+    override fun getPageTitle(position: Int): CharSequence? {
+        return TitleList[position]
     }
 
-    @Nullable
-    @Override
-    public CharSequence getPageTitle(int position) {
-        return TitleList.get(position);
-    }
-
-    public void addFragment(Fragment fragment, String title){
-        mFragment.add(fragment);
-        TitleList.add(title);
+    fun addFragment(fragment: Fragment, title: String) {
+        mFragment.add(fragment)
+        TitleList.add(title)
     }
 }

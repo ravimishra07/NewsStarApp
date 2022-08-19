@@ -1,92 +1,34 @@
-package com.ravimishra.newstar.Model;
+package com.ravimishra.newstar.Model
 
-import com.google.gson.annotations.Expose;
-import com.google.gson.annotations.SerializedName;
+import com.google.gson.annotations.Expose
+import com.google.gson.annotations.SerializedName
 
-public class Articles {
-
+class Articles {
     @SerializedName("source")
     @Expose
-    Source source ;
-
-    public String getDate() {
-        return date;
-    }
-
-    public void setDate(String date) {
-        this.date = date;
-    }
+    var source: Source? = null
 
     @SerializedName("publishedAt")
     @Expose
-    String date;
+    var date: String? = null
 
     @SerializedName("author")
     @Expose
-    String author;
+    var author: String? = null
 
     @SerializedName("title")
     @Expose
-    String title;
-
-    public Source getSource() {
-        return source;
-    }
-
-    public void setSource(Source source) {
-        this.source = source;
-    }
-
-    public String getAuthor() {
-        return author;
-    }
-
-    public void setAuthor(String author) {
-        this.author = author;
-    }
-
-    public String getTitle() {
-        return title;
-    }
-
-    public void setTitle(String title) {
-        this.title = title;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    public String getUrl() {
-        return url;
-    }
-
-    public void setUrl(String url) {
-        this.url = url;
-    }
-
-    public String getUrlToImage() {
-        return urlToImage;
-    }
-
-    public void setUrlToImage(String urlToImage) {
-        this.urlToImage = urlToImage;
-    }
+    var title: String? = null
 
     @SerializedName("description")
     @Expose
-    String description;
+    var description: String? = null
 
     @SerializedName("url")
     @Expose
-    String url;
-
+    var url: String? = null
 
     @SerializedName("urlToImage")
     @Expose
-    String urlToImage;
+    var urlToImage: String? = null
 }

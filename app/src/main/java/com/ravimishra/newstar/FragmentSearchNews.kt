@@ -1,177 +1,151 @@
-package com.ravimishra.newstar;
+package com.ravimishra.newstar
 
-import android.content.Context;
-import android.net.ConnectivityManager;
-import android.net.Uri;
-import android.os.Bundle;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.widget.SwipeRefreshLayout;
-import android.support.v7.widget.DefaultItemAnimator;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.Button;
-import android.widget.FrameLayout;
-import android.widget.ImageView;
-import android.widget.RelativeLayout;
-import android.widget.TextView;
-import android.widget.Toast;
+import android.content.Context
+import android.net.ConnectivityManager
+import android.net.Uri
+import android.os.Bundle
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import android.widget.*
+import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentManager
+import androidx.recyclerview.widget.DefaultItemAnimator
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout.OnRefreshListener
+import com.facebook.shimmer.ShimmerFrameLayout
+import com.ravimishra.newstar.ApiClient.apiClient
+import com.ravimishra.newstar.Model.Articles
+import com.ravimishra.newstar.Model.News
+import com.ravimishra.newstar.Utils.country
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
 
-import com.facebook.shimmer.ShimmerFrameLayout;
-import com.ravimishra.newstar.Model.Articles;
-import com.ravimishra.newstar.Model.News;
-
-import java.util.ArrayList;
-import java.util.List;
-
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
-
-
-public class FragmentSearchNews extends Fragment {
-    TextView ty_error;
-    ImageView iv_error;
-    RecyclerView recyclerViewTopNews;
-    FrameLayout frameLayoutSeacrchNews;
-    FragmentManager fragmentManager;
-    FragmentSearchNews.OnFragmentInteractionListener mListener;
-    RecyclerView recyclerView;
-    RvAdapter rvAdapter;
-    SwipeRefreshLayout swipeRefreshLayout;
-    RecyclerView.LayoutManager layoutManager;
-    RelativeLayout errorLayout;
-    Button btnRetry;
-    private ShimmerFrameLayout mShimmerViewContainer;
-    private List<Articles> articles = new ArrayList<>();
-
-
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-
+class FragmentSearchNews : Fragment() {
+    var ty_error: TextView? = null
+    var iv_error: ImageView? = null
+    var recyclerViewTopNews: RecyclerView? = null
+    var frameLayoutSeacrchNews: FrameLayout? = null
+    var mListener: OnFragmentInteractionListener? = null
+    var recyclerView: RecyclerView? = null
+    var rvAdapter: RvAdapter? = null
+    var swipeRefreshLayout: SwipeRefreshLayout? = null
+    var layoutManager: RecyclerView.LayoutManager? = null
+    var errorLayout: RelativeLayout? = null
+    var btnRetry: Button? = null
+    private var mShimmerViewContainer: ShimmerFrameLayout? = null
+    private var articles: List<Articles> = ArrayList()
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
     }
 
-    @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
+    override fun onCreateView(
+        inflater: LayoutInflater, container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
         // Inflate the layout for this
-        View view = inflater.inflate(R.layout.fragment_fragment_search_news, container, false);
-
-       frameLayoutSeacrchNews = view.findViewById(R.id.searchNewsLayout);
-        iv_error = view.findViewById(R.id.iv_error);
-        ty_error = view.findViewById(R.id.tv_error);
-        swipeRefreshLayout = view.findViewById(R.id.swipeRefresh);
-        mShimmerViewContainer = view.findViewById(R.id.shimmer_view_container);
+        val view = inflater.inflate(R.layout.fragment_fragment_search_news, container, false)
+        frameLayoutSeacrchNews = view.findViewById(R.id.searchNewsLayout)
+        iv_error = view.findViewById(R.id.iv_error)
+        ty_error = view.findViewById(R.id.tv_error)
+        swipeRefreshLayout = view.findViewById(R.id.swipeRefresh)
+        mShimmerViewContainer = view.findViewById(R.id.shimmer_view_container)
         //  btnRetry=view.findViewById(R.id.btnRetry);
-        errorLayout = view.findViewById(R.id.error_layout);
-        recyclerView = view.findViewById(R.id.recylerviewTopNews);
-        layoutManager = new LinearLayoutManager(getActivity());
-        recyclerView.setLayoutManager(layoutManager);
-        recyclerView.setItemAnimator(new DefaultItemAnimator());
+        errorLayout = view.findViewById(R.id.error_layout)
+        recyclerView = view.findViewById(R.id.recylerviewTopNews)
+        layoutManager = LinearLayoutManager(activity)
+        recyclerView?.setLayoutManager(layoutManager)
+        recyclerView?.setItemAnimator(DefaultItemAnimator())
         // recyclerView.setAdapter(rvAdapter);
-        recyclerView.setNestedScrollingEnabled(false);
-        recyclerView.setItemAnimator(new DefaultItemAnimator());
-        mShimmerViewContainer.startShimmerAnimation();
+        recyclerView?.setNestedScrollingEnabled(false)
+        recyclerView?.setItemAnimator(DefaultItemAnimator())
+        mShimmerViewContainer?.startShimmer()
         //  recyclerView.addItemDecoration(new MyDividerItemDecoration(this, LinearLayoutManager.VERTICAL, 16));
         //recyclerView);
-        checkNetwork();
-
-        swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
-            @Override
-            public void onRefresh() {
-                checkNetwork();
-                loadJSON();
-                swipeRefreshLayout.setRefreshing(false);
-            }
-        });
-        loadJSON();
-        return view;
+        checkNetwork()
+        swipeRefreshLayout?.setOnRefreshListener(OnRefreshListener {
+            checkNetwork()
+            loadJSON()
+            swipeRefreshLayout?.setRefreshing(false)
+        })
+        loadJSON()
+        return view
     }
 
-
-    public void loadJSON() {
-        ApiInterface apiInterface = ApiClient.getApiClient().create(ApiInterface.class);
-        String country = Utils.getCountry();
+    fun loadJSON() {
+        val apiInterface = apiClient.create(ApiInterface::class.java)
+        val country = country
         //String q = "india";
-        Call<News> call;
-        String strtext = getArguments().getString("query");
-        call = apiInterface.getNews(strtext,Constants.API_KEY,50);
-        call.enqueue(new Callback<News>() {
-            @Override
-            public void onResponse(Call<News> call, Response<News> response) {
-                if (response.isSuccessful() && response.body().getArticles() != null) {
-
-                    articles = response.body().getArticles();
-                    rvAdapter = new RvAdapter(articles, getActivity());
-                    recyclerView.setAdapter(rvAdapter);
-                    rvAdapter.notifyDataSetChanged();
-                    mShimmerViewContainer.stopShimmerAnimation();
-                    mShimmerViewContainer.setVisibility(View.GONE);
+        val call: Call<News>
+        val strtext = arguments?.getString("query")
+        call = apiInterface.getNews(strtext, Constants.API_KEY, 50)
+        call.enqueue(object : Callback<News> {
+            override fun onResponse(call: Call<News>, response: Response<News>) {
+                if (response.isSuccessful && response.body()!!.articles != null) {
+                    articles = response.body()!!.articles
+                    rvAdapter = RvAdapter(articles, activity!!)
+                    recyclerView!!.adapter = rvAdapter
+                    rvAdapter!!.notifyDataSetChanged()
+                    mShimmerViewContainer!!.stopShimmer()
+                    mShimmerViewContainer!!.visibility = View.GONE
                 } else {
-                    Toast.makeText(getActivity(), "No result", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(activity, "No result", Toast.LENGTH_SHORT).show()
                 }
             }
 
-            @Override
-            public void onFailure(Call<News> call, Throwable t) {
-
-            }
-        });
+            override fun onFailure(call: Call<News>, t: Throwable) {}
+        })
     }
 
-
-    public interface OnFragmentInteractionListener {
+    interface OnFragmentInteractionListener {
         // TODO: Update argument type and name
-        void onFragmentInteraction(Uri uri);
+        fun onFragmentInteraction(uri: Uri?)
     }
 
-    public void checkNetwork() {
-        if (isNetworkAvailable()) {
-            ty_error.setVisibility(View.GONE);
-            iv_error.setVisibility(View.GONE);
-            errorLayout.setVisibility(View.GONE);
-            mShimmerViewContainer.setVisibility(View.VISIBLE);
-            recyclerView.setVisibility(View.VISIBLE);
+    fun checkNetwork() {
+        if (isNetworkAvailable) {
+            ty_error!!.visibility = View.GONE
+            iv_error!!.visibility = View.GONE
+            errorLayout!!.visibility = View.GONE
+            mShimmerViewContainer!!.visibility = View.VISIBLE
+            recyclerView!!.visibility = View.VISIBLE
             // loadJSON();
             //      Toast.makeText(this, "connecte4d", Toast.LENGTH_SHORT).show();
         } else {
-            Toast.makeText(getActivity(), "no connection", Toast.LENGTH_SHORT).show();
-            recyclerView.setVisibility(View.GONE);
-            ty_error.setVisibility(View.VISIBLE);
-            iv_error.setVisibility(View.VISIBLE);
-            mShimmerViewContainer.setVisibility(View.GONE);
-            errorLayout.setVisibility(View.VISIBLE);
+            Toast.makeText(activity, "no connection", Toast.LENGTH_SHORT).show()
+            recyclerView!!.visibility = View.GONE
+            ty_error!!.visibility = View.VISIBLE
+            iv_error!!.visibility = View.VISIBLE
+            mShimmerViewContainer!!.visibility = View.GONE
+            errorLayout!!.visibility = View.VISIBLE
         }
     }
 
-    public boolean isNetworkAvailable() {
-        final ConnectivityManager connectivityManager = ((ConnectivityManager) getActivity().getSystemService(Context.CONNECTIVITY_SERVICE));
-        return connectivityManager.getActiveNetworkInfo() != null && connectivityManager.getActiveNetworkInfo().isConnected();
-    }
+    val isNetworkAvailable: Boolean
+        get() {
+            val connectivityManager =
+                activity?.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+            return connectivityManager.activeNetworkInfo != null && connectivityManager.activeNetworkInfo!!
+                .isConnected
+        }
 
-    public FragmentSearchNews() {
-        // Required empty public constructor
-    }
-    @Override
-    public void onAttach(Context context) {
-        super.onAttach(context);
-        if (context instanceof FragmentSearchNews.OnFragmentInteractionListener) {
-            mListener = (FragmentSearchNews.OnFragmentInteractionListener) context;
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+        mListener = if (context is OnFragmentInteractionListener) {
+            context
         } else {
-            throw new RuntimeException(context.toString()
-                    + " must implement OnFragmentInteractionListener");
+            throw RuntimeException(
+                context.toString()
+                        + " must implement OnFragmentInteractionListener"
+            )
         }
     }
 
-
-    @Override
-    public void onDetach() {
-        super.onDetach();
-        mListener = null;
+    override fun onDetach() {
+        super.onDetach()
+        mListener = null
     }
-
 }

@@ -1,89 +1,70 @@
-package com.ravimishra.newstar;
+package com.ravimishra.newstar
 
-import android.content.Intent;
-import android.graphics.Bitmap;
-import android.os.Bundle;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
-import android.view.MenuItem;
-import android.view.View;
-import android.webkit.WebChromeClient;
-import android.webkit.WebSettings;
-import android.webkit.WebView;
-import android.webkit.WebViewClient;
-import android.widget.ProgressBar;
+import android.graphics.Bitmap
+import android.os.Bundle
+import android.view.MenuItem
+import android.view.View
+import android.webkit.WebChromeClient
+import android.webkit.WebView
+import android.webkit.WebViewClient
+import android.widget.ProgressBar
+import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.widget.Toolbar
 
-public class DetailActivity extends AppCompatActivity {
-WebView webView;
-ProgressBar progressBar;
-String url;
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_detail);
-
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
-  toolbar.setTitle("NewsStar");
-       Intent intent = getIntent();
-        url = intent.getExtras().getString("news detail");
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        getSupportActionBar().setDisplayShowHomeEnabled(true);
-        progressBar = (ProgressBar) findViewById(R.id.progressBar);
-        progressBar.setMax(100);
-        progressBar.setProgress(1);
-         webView=findViewById(R.id.webView);
-        WebSettings webSettings = webView.getSettings();
-        webSettings.setJavaScriptEnabled(true);
-
-        webView.loadUrl(url);
-
-        webView.setWebChromeClient(new WebChromeClient() {
-            public void onProgressChanged(WebView view, int progress) {
-                progressBar.setProgress(progress);
+class DetailActivity : AppCompatActivity() {
+    var webView: WebView? = null
+    var progressBar: ProgressBar? = null
+    var url: String? = null
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_detail)
+        val toolbar = findViewById<Toolbar>(R.id.toolbar)
+        setSupportActionBar(toolbar)
+        toolbar.title = "NewsStar"
+        val intent = intent
+        url = intent.extras!!.getString("news detail")
+        supportActionBar!!.setDisplayHomeAsUpEnabled(true)
+        supportActionBar!!.setDisplayShowHomeEnabled(true)
+        progressBar = findViewById<View>(R.id.progressBar) as ProgressBar
+        progressBar!!.max = 100
+        progressBar!!.progress = 1
+        webView = findViewById(R.id.webView)
+        val webSettings = webView?.getSettings()
+        webSettings?.javaScriptEnabled = true
+        webView?.loadUrl(url!!)
+        webView?.setWebChromeClient(object : WebChromeClient() {
+            override fun onProgressChanged(view: WebView, progress: Int) {
+                progressBar!!.progress = progress
             }
-        });
-        webView.setWebViewClient(new WebViewClient() {
-
-            @Override
-            public void onPageStarted(WebView view, String url, Bitmap favicon) {
-                super.onPageStarted(view, url, favicon);
-                progressBar.setVisibility(View.VISIBLE);
-
-
+        })
+        webView?.setWebViewClient(object : WebViewClient() {
+            override fun onPageStarted(view: WebView, url: String, favicon: Bitmap) {
+                super.onPageStarted(view, url, favicon)
+                progressBar!!.visibility = View.VISIBLE
             }
 
-            @Override
-            public boolean shouldOverrideUrlLoading(WebView view, String url) {
-                view.loadUrl(url);
-                return true;
+            override fun shouldOverrideUrlLoading(view: WebView, url: String): Boolean {
+                view.loadUrl(url)
+                return true
             }
 
-            @Override
-            public void onPageFinished(WebView view, String url) {
-
-                progressBar.setVisibility(View.GONE);
+            override fun onPageFinished(view: WebView, url: String) {
+                progressBar!!.visibility = View.GONE
             }
-        });
+        })
     }
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
         // Handle action bar item clicks here. The action bar will
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-
-        //noinspection SimplifiableIfStatement
+        val id = item.itemId
         if (id == R.id.action_settings) {
-            return true;
+            return true
         }
-        if (item.getItemId() == android.R.id.home) {
-            finish(); // close this activity and return to preview activity (if there is any)
+        if (item.itemId == android.R.id.home) {
+            finish() // close this activity and return to preview activity (if there is any)
         }
-
-        return super.onOptionsItemSelected(item);
+        return super.onOptionsItemSelected(item)
     }
-
 }
